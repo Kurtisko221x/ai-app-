@@ -1,0 +1,85 @@
+// Databáza projektu XSkinny AI scripter.
+// SQLite = jednoduchý súbor (dev.db). Neskôr sa dá prehodiť na Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // PostgreSQL — funguje lokálne aj na Railway (na produkcii treba trvalú DB).
+  // Lokálne dev: použi connection string z Railway Postgres (viď DEPLOY.md).
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  robloxName   String? // Roblox používateľské meno (nepovinné)
+  robloxUrl    String? // URL na Roblox profil (nepovinné)
+  credits      Int      @default(30)
+  role         String   @default("user") // "user" | "admin"
+  createdAt    DateTime @default(now())
+
+  chats          Chat[]
+  creditRequests CreditRequest[]
+  redemptions    PromoRedemption[]
+}
+
+// Uložená história konverzácií
+model Chat {
+  id        String    @id @default(cuid())
+  title     String    @default("Nový chat")
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String // "user" | "assistant"
+  content   String
+  createdAt DateTime @default(now())
+}
+
+// Žiadosť o free kredity (používateľ napíše dôvod, admin schváli)
+model CreditRequest {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason    String
+  amount    Int       @default(50) // koľko kreditov žiada / bude pridelených
+  status    String    @default("pending") // pending | approved | rejected
+  createdAt DateTime  @default(now())
+  handledAt DateTime?
+}
+
+// Promo kódy na giveaway
+model PromoCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  credits   Int
+  maxUses   Int      @default(1)
+  uses      Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  redemptions PromoRedemption[]
+}
+
+model PromoRedemption {
+  id        String   @id @default(cuid())
+  codeId    String
+  code      PromoCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@unique([codeId, userId]) // jeden kód môže použiť používateľ len raz
+}
