@@ -1415,6 +1415,45 @@ body::before {
   margin-top: 8px !important;
 }
 
+/* ---------- Plugin API key panel ---------- */
+.plugin-box {
+  margin: 0 0 24px;
+}
+.apikey-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.apikey-value {
+  flex: 1;
+  min-width: 200px;
+  background: #0b0f14;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 13px;
+  color: #7ee787;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.apikey-btn {
+  background: var(--bg-elev2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.apikey-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 /* ---------- Admin ---------- */
 .admin {
   max-width: 1080px;

@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { prisma } from "./db";
 
 const COOKIE_NAME = "roblox_ai_session";
@@ -94,5 +95,24 @@ export async function getCurrentUser(): Promise<SafeUser | null> {
   if (user.role !== "admin" && isAdminEmail(user.email)) {
     return { ...user, role: "admin" };
   }
+  return user;
+}
+
+// ---------- API kľúč pre Roblox Studio plugin ----------
+
+// Vygeneruje nový API kľúč (formát: xsk_<64 hex znakov>)
+export function generateApiKey(): string {
+  return "xsk_" + randomBytes(32).toString("hex");
+}
+
+// Nájde používateľa podľa API kľúča (autentifikácia pluginu — bez cookies)
+export async function getUserByApiKey(
+  key: string | null | undefined
+): Promise<{ id: string; credits: number } | null> {
+  if (!key || !key.startsWith("xsk_")) return null;
+  const user = await prisma.user.findUnique({
+    where: { apiKey: key },
+    select: { id: true, credits: true },
+  });
   return user;
 }

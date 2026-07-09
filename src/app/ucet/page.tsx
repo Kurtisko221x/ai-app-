@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
 import AccountPanel from "@/components/AccountPanel";
+import PluginKeyPanel from "@/components/PluginKeyPanel";
 import { Avatar, BrandName } from "@/components/Brand";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,8 @@ export default async function AccountPage() {
         </div>
 
         <AccountPanel credits={user.credits} />
+
+        <PluginKeyPanel />
 
         <div className="account-actions">
           <Link href="/chat" className="btn btn-primary">

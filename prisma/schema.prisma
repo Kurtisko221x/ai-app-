@@ -21,6 +21,7 @@ model User {
   robloxUrl    String? // URL na Roblox profil (nepovinné)
   credits      Int      @default(30)
   role         String   @default("user") // "user" | "admin"
+  apiKey       String?  @unique // kľúč pre Roblox Studio plugin
   createdAt    DateTime @default(now())
 
   chats          Chat[]
