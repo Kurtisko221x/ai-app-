@@ -14,6 +14,34 @@ Návod krok po kroku. Všetky príkazy spúšťaj v priečinku **`roblox-ai`**.
 
 ---
 
+---
+
+# 🅰️ Metóda z GitHubu (najjednoduchšie, odporúčané)
+
+Kód už je na GitHube: **https://github.com/Kurtisko221x/ai-app-**
+
+1. Choď na **https://railway.com** → **New Project** → **Deploy from GitHub repo**.
+2. Povoľ Railway prístup k GitHubu a vyber repo **`ai-app-`**.
+3. Railway začne build. Pridaj databázu: **+ New** → **Database** → **Add PostgreSQL**.
+4. Klikni na **appku** (nie DB) → záložka **Variables** → nastav (viď tabuľka v Kroku 3 nižšie):
+   `OPENROUTER_API_KEY`, `AUTH_SECRET`, `ADMIN_EMAILS`, `DATABASE_URL=${{Postgres.DATABASE_URL}}`.
+5. Appka → **Settings** → **Networking** → **Generate Domain** → dostaneš URL.
+6. Skopíruj tú URL do premennej **`APP_URL`** → appka sa redeployne.
+7. Otvor URL, zaregistruj sa svojím admin emailom → si admin. 🎉
+
+> Keď neskôr niečo zmeníš: `git push` → Railway **automaticky** nasadí novú verziu.
+
+**Ako pushnúť zmeny na GitHub:**
+```bash
+git add -A
+git commit -m "popis zmeny"
+git push
+```
+
+---
+
+# 🅱️ Metóda cez Railway CLI (alternatíva)
+
 ## Krok 1 — Nainštaluj Railway CLI a prihlás sa
 
 ```bash
