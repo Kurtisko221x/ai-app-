@@ -13,7 +13,9 @@
 	Backend: XSkinny AI (Railway).
 ]]
 
-local API_URL = "https://ai-app-production-d99c.up.railway.app/api/plugin/generate"
+local BASE_URL = "https://ai-app-production-d99c.up.railway.app"
+local API_URL = BASE_URL .. "/api/plugin/generate"
+local PULL_URL = BASE_URL .. "/api/studio/pull"
 local SETTING_KEY = "XSkinnyAI_ApiKey"
 
 local HttpService = game:GetService("HttpService")
@@ -167,11 +169,25 @@ status.TextSize = 12
 status.TextXAlignment = Enum.TextXAlignment.Left
 status.Parent = root
 
+-- Stav pripojenia k webu (most: web -> Studio)
+local bridge = Instance.new("TextLabel")
+bridge.Size = UDim2.new(1, 0, 0, 20)
+bridge.LayoutOrder = nextOrder()
+bridge.BackgroundColor3 = COL.elev
+bridge.TextColor3 = COL.dim
+bridge.Text = "  ○ Nepripojené — vlož API kľúč"
+bridge.Font = Enum.Font.Gotham
+bridge.TextSize = 12
+bridge.TextXAlignment = Enum.TextXAlignment.Left
+bridge.BorderSizePixel = 0
+bridge.Parent = root
+corner(bridge, 6)
+
 ----------------------------------------------------------------------
 -- Výsledky (scrollujúci zoznam)
 ----------------------------------------------------------------------
 local results = Instance.new("ScrollingFrame")
-results.Size = UDim2.new(1, 0, 1, -190)
+results.Size = UDim2.new(1, 0, 1, -218)
 results.LayoutOrder = nextOrder()
 results.BackgroundTransparency = 1
 results.BorderSizePixel = 0
@@ -394,4 +410,77 @@ genBtn.MouseButton1Click:Connect(generate)
 ----------------------------------------------------------------------
 button.Click:Connect(function()
 	widget.Enabled = not widget.Enabled
+end)
+
+----------------------------------------------------------------------
+-- MOST web -> Studio: polling fronty skriptov z webu
+-- Používateľ chatuje na webe a klikne "Poslať do Studia" — sem to príde a vloží sa.
+----------------------------------------------------------------------
+local function logInserted(scriptData, parentName)
+	local line = Instance.new("TextLabel")
+	line.Size = UDim2.new(1, -6, 0, 0)
+	line.AutomaticSize = Enum.AutomaticSize.Y
+	line.BackgroundColor3 = COL.elev
+	line.TextColor3 = COL.green
+	line.Text = "  ✓ " .. scriptData.name .. "  →  " .. parentName
+	line.Font = Enum.Font.Gotham
+	line.TextSize = 12
+	line.TextWrapped = true
+	line.TextXAlignment = Enum.TextXAlignment.Left
+	line.LayoutOrder = -os.time() % 100000 -- najnovšie hore
+	line.Parent = results
+	corner(line, 6)
+	local p = Instance.new("UIPadding")
+	p.PaddingTop = UDim.new(0, 5)
+	p.PaddingBottom = UDim.new(0, 5)
+	p.PaddingLeft = UDim.new(0, 4)
+	p.Parent = line
+end
+
+task.spawn(function()
+	while true do
+		task.wait(3)
+		if not apiKey or #apiKey < 8 then
+			bridge.Text = "  ○ Nepripojené — vlož API kľúč"
+			bridge.TextColor3 = COL.dim
+			continue
+		end
+
+		local ok, response = pcall(function()
+			return HttpService:RequestAsync({
+				Url = PULL_URL,
+				Method = "GET",
+				Headers = { ["Authorization"] = "Bearer " .. apiKey },
+			})
+		end)
+
+		if not ok then
+			bridge.Text = "  ⚠ Nedá sa spojiť (povoľ HTTP v Game Settings)"
+			bridge.TextColor3 = COL.red
+			continue
+		end
+		if not response.Success then
+			if response.StatusCode == 401 then
+				bridge.Text = "  ⚠ Neplatný API kľúč"
+			else
+				bridge.Text = "  ⚠ Chyba " .. tostring(response.StatusCode)
+			end
+			bridge.TextColor3 = COL.red
+			continue
+		end
+
+		bridge.Text = "  🟢 Pripojené — čakám na skripty z webu…"
+		bridge.TextColor3 = COL.green
+
+		local okDec, data = pcall(function()
+			return HttpService:JSONDecode(response.Body)
+		end)
+		if okDec and data and data.scripts and #data.scripts > 0 then
+			for _, s in ipairs(data.scripts) do
+				local parent = insertScript(s)
+				logInserted(s, parent.Name)
+			end
+			bridge.Text = "  ⚡ Vložených " .. tostring(#data.scripts) .. " skriptov z webu!"
+		end
+	end
 end)

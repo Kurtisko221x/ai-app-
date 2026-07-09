@@ -24,14 +24,14 @@ const VALID_TARGETS = [
   "Workspace",
 ];
 
-function normalizeClass(raw: string): PluginScript["className"] {
+export function normalizeClass(raw: string): PluginScript["className"] {
   const t = raw.trim().toLowerCase();
   if (t.includes("localscript")) return "LocalScript";
   if (t.includes("modulescript")) return "ModuleScript";
   return "Script";
 }
 
-function normalizeTarget(raw: string): string {
+export function normalizeTarget(raw: string): string {
   const t = raw.trim().toLowerCase();
   const match = VALID_TARGETS.find((v) => v.toLowerCase() === t);
   if (match) return match;
@@ -40,7 +40,7 @@ function normalizeTarget(raw: string): string {
   return partial ?? "ServerScriptService";
 }
 
-function sanitizeName(raw: string): string {
+export function sanitizeName(raw: string): string {
   const cleaned = raw.trim().replace(/[^\w]/g, "").slice(0, 40);
   return cleaned || "XSkinnyScript";
 }

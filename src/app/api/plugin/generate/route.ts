@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model,
         stream: false,
-        max_tokens: 3000,
+        max_tokens: 4000,
         messages,
       }),
     });
@@ -100,7 +100,8 @@ export async function POST(request: Request) {
       }
     }
     lastStatus = res.status;
-    if (res.status !== 429 && res.status !== 404) break;
+    // 402 = platený model bez kreditu → skús ďalší (nakoniec free).
+    if (res.status !== 429 && res.status !== 404 && res.status !== 402) break;
   }
 
   if (!ok) {

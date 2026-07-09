@@ -27,6 +27,20 @@ model User {
   chats          Chat[]
   creditRequests CreditRequest[]
   redemptions    PromoRedemption[]
+  studioJobs     StudioJob[]
+}
+
+// Fronta skriptov čakajúcich na vloženie do Roblox Studia (most web -> plugin).
+// Web sem pridá skript po kliknutí "Poslať do Studia", plugin si ich vyzdvihne.
+model StudioJob {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  className String // Script | LocalScript | ModuleScript
+  target    String // ServerScriptService | StarterGui | ...
+  source    String
+  createdAt DateTime @default(now())
 }
 
 // Uložená história konverzácií

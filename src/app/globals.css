@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/* Tlačidlo "Poslať do Studia" pod AI odpoveďou */
+.studio-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.studio-btn {
+  background: linear-gradient(135deg, #27c93f, #17a52c);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.studio-btn:hover {
+  filter: brightness(1.08);
+}
+.studio-status {
+  font-size: 12px;
+  color: #8b98a5;
+}
+
 :root {
   --bg: #0d1117;
   --bg-elev: #161b22;

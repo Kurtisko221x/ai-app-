@@ -42,6 +42,7 @@ export default function Chat({
   const [credits, setCredits] = useState(initialCredits);
   const [outOfCredits, setOutOfCredits] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [studioStatus, setStudioStatus] = useState<Record<number, string>>({});
 
   // modal na free kredity
   const [showCreditModal, setShowCreditModal] = useState(false);
@@ -206,6 +207,28 @@ export default function Chat({
     router.refresh();
   }
 
+  async function sendToStudio(index: number, content: string) {
+    setStudioStatus((s) => ({ ...s, [index]: "posielam" }));
+    try {
+      const res = await fetch("/api/studio/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Chyba");
+      setStudioStatus((s) => ({
+        ...s,
+        [index]: `✓ Poslané do Studia (${data.count})`,
+      }));
+    } catch (err) {
+      setStudioStatus((s) => ({
+        ...s,
+        [index]: "⚠️ " + (err instanceof Error ? err.message : "Chyba"),
+      }));
+    }
+  }
+
   async function submitCreditRequest() {
     if (reason.trim().length < 5) {
       setReqError("Napíš aspoň krátky dôvod (min. 5 znakov).");
@@ -353,7 +376,26 @@ export default function Chat({
                 <div className="bubble">
                   {m.role === "assistant" ? (
                     m.content ? (
-                      <Markdown content={m.content} />
+                      <>
+                        <Markdown content={m.content} />
+                        {m.content.includes("```") &&
+                          !(loading && i === messages.length - 1) && (
+                            <div className="studio-actions">
+                              <button
+                                className="studio-btn"
+                                onClick={() => sendToStudio(i, m.content)}
+                                type="button"
+                              >
+                                📤 Poslať do Studia
+                              </button>
+                              {studioStatus[i] && (
+                                <span className="studio-status">
+                                  {studioStatus[i]}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                      </>
                     ) : (
                       <span className="typing">
                         <span />

@@ -65,9 +65,11 @@ export default async function PluginPage() {
         <h1 style={{ fontSize: 40, margin: "12px 0" }}>
           Píš skripty <span className="grad">priamo v Roblox Studio</span> 🪄
         </h1>
-        <p style={{ color: "var(--text-dim)", fontSize: 17, maxWidth: 620, margin: "0 auto 26px" }}>
-          Žiadne kopírovanie. Napíšeš čo chceš, klikneš „Vložiť" a skript sa
-          objaví presne tam kam patrí — ServerScriptService, StarterGui...
+        <p style={{ color: "var(--text-dim)", fontSize: 17, maxWidth: 640, margin: "0 auto 26px" }}>
+          Chatuj pohodlne na webe, a pri každej odpovedi klikni{" "}
+          <b>„📤 Poslať do Studia"</b> — skript sa <b>okamžite objaví v Studiu</b>{" "}
+          na správnom mieste (ServerScriptService, StarterGui…). Plugin stačí raz
+          nainštalovať a nechať pripojený.
         </p>
         <a href="/XSkinnyAI.lua" download className="btn btn-primary lg">
           ⬇ Stiahnuť plugin (.lua)
@@ -86,6 +88,41 @@ export default async function PluginPage() {
               <p>{s.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Ako to používať</h2>
+          <p>
+            Keď máš plugin nainštalovaný a pripojený (zelený stav), stačí:
+          </p>
+        </div>
+        <div className="steps">
+          <div className="step" style={{ textAlign: "left" }}>
+            <div className="step-num">1</div>
+            <h3>Chatuj na webe</h3>
+            <p>
+              Otvor <Link href="/chat">chat</Link> a popíš čo chceš. Môžeš
+              pokračovať v konverzácii, upravovať, pýtať sa ďalej.
+            </p>
+          </div>
+          <div className="step" style={{ textAlign: "left" }}>
+            <div className="step-num">2</div>
+            <h3>Poslať do Studia</h3>
+            <p>
+              Pod odpoveďou klikni <b>„📤 Poslať do Studia"</b>. Skript sa pošle
+              tvojmu pripojenému pluginu.
+            </p>
+          </div>
+          <div className="step" style={{ textAlign: "left" }}>
+            <div className="step-num">3</div>
+            <h3>Objaví sa v hre</h3>
+            <p>
+              Plugin ho <b>automaticky vloží</b> na správne miesto (a je to
+              vratné cez Ctrl+Z). 🎉
+            </p>
+          </div>
         </div>
       </section>
 
