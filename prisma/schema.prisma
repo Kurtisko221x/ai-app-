@@ -22,12 +22,27 @@ model User {
   credits      Int      @default(30)
   role         String   @default("user") // "user" | "admin"
   apiKey       String?  @unique // kľúč pre Roblox Studio plugin
+  discordId    String?  @unique // prepojený Discord účet (prihlásenie cez Discord)
+  discordName  String? // Discord používateľské meno (na zobrazenie)
   createdAt    DateTime @default(now())
 
   chats          Chat[]
   creditRequests CreditRequest[]
   redemptions    PromoRedemption[]
   studioJobs     StudioJob[]
+}
+
+// Level systém pre Discord (XP za správy)
+model DiscordUser {
+  id        String   @id @default(cuid())
+  guildId   String
+  discordId String
+  xp        Int      @default(0)
+  level     Int      @default(0)
+  messages  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, discordId])
 }
 
 // Fronta skriptov čakajúcich na vloženie do Roblox Studia (most web -> plugin).

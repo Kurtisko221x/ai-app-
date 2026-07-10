@@ -11,11 +11,14 @@
     "start": "next start",
     "db:deploy": "prisma db push --accept-data-loss",
     "postinstall": "prisma generate",
+    "bot": "tsx bot/index.ts",
+    "bot:deploy": "tsx bot/deploy-commands.ts",
     "lint": "eslint"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
+    "discord.js": "^14.26.4",
     "highlight.js": "^11.11.1",
     "jose": "^6.2.3",
     "next": "16.2.10",
@@ -36,6 +39,7 @@
     "eslint-config-next": "16.2.10",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   }
 }

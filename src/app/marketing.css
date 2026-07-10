@@ -1454,6 +1454,44 @@ body::before {
   border-color: var(--accent);
 }
 
+/* ---------- Discord prihlásenie ---------- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 12px;
+  margin: 18px 0 14px;
+  gap: 10px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.discord-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: #5865f2;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.discord-btn:hover {
+  filter: brightness(1.08);
+}
+
 /* ---------- Admin ---------- */
 .admin {
   max-width: 1080px;
