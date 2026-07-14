@@ -44,7 +44,9 @@ type Overview = {
 
 export default function AdminDashboard() {
   const [data, setData] = useState<Overview | null>(null);
-  const [tab, setTab] = useState<"requests" | "users" | "promo">("requests");
+  const [tab, setTab] = useState<"requests" | "users" | "promo" | "news">(
+    "requests"
+  );
   const [amounts, setAmounts] = useState<Record<string, number>>({});
 
   // promo form
@@ -52,6 +54,33 @@ export default function AdminDashboard() {
   const [pCredits, setPCredits] = useState(100);
   const [pUses, setPUses] = useState(50);
   const [pMsg, setPMsg] = useState<string | null>(null);
+
+  // news form
+  const [nTitle, setNTitle] = useState("");
+  const [nBody, setNBody] = useState("");
+  const [nMsg, setNMsg] = useState<string | null>(null);
+  const [nSending, setNSending] = useState(false);
+
+  async function sendNews() {
+    setNMsg(null);
+    setNSending(true);
+    try {
+      const res = await fetch("/api/admin/announce", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: nTitle, body: nBody }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error ?? "Chyba");
+      setNMsg("✅ Novinka odoslaná do Discordu!");
+      setNTitle("");
+      setNBody("");
+    } catch (e) {
+      setNMsg("⚠️ " + (e instanceof Error ? e.message : "Chyba"));
+    } finally {
+      setNSending(false);
+    }
+  }
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/overview");
@@ -145,6 +174,12 @@ export default function AdminDashboard() {
           onClick={() => setTab("promo")}
         >
           Promo kódy
+        </button>
+        <button
+          className={tab === "news" ? "active" : ""}
+          onClick={() => setTab("news")}
+        >
+          📣 Novinky
         </button>
       </div>
 
@@ -368,6 +403,63 @@ export default function AdminDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+      )}
+
+      {/* NOVINKY */}
+      {tab === "news" && (
+        <section>
+          <div className="promo-create">
+            <h3>📣 Poslať novinku do Discordu (#oznamy)</h3>
+            <p className="td-sub" style={{ marginBottom: 14 }}>
+              Napíš novinku a objaví sa členom priamo v Discord kanáli #oznamy.
+            </p>
+            <label
+              style={{
+                display: "block",
+                fontSize: 12,
+                color: "var(--text-dim)",
+                fontWeight: 600,
+                marginBottom: 6,
+              }}
+            >
+              Nadpis
+            </label>
+            <input
+              value={nTitle}
+              onChange={(e) => setNTitle(e.target.value)}
+              placeholder="Napr.: Pridali sme Studio plugin!"
+              className="acc-input"
+              style={{ width: "100%", marginBottom: 12 }}
+            />
+            <label
+              style={{
+                display: "block",
+                fontSize: 12,
+                color: "var(--text-dim)",
+                fontWeight: 600,
+                marginBottom: 6,
+              }}
+            >
+              Text novinky
+            </label>
+            <textarea
+              value={nBody}
+              onChange={(e) => setNBody(e.target.value)}
+              placeholder="Čo je nové? Podporuje **markdown**."
+              className="acc-textarea"
+              rows={5}
+              style={{ width: "100%", marginBottom: 12 }}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={sendNews}
+              disabled={nSending || !nTitle.trim() || !nBody.trim()}
+            >
+              {nSending ? "Odosielam…" : "📣 Odoslať do Discordu"}
+            </button>
+            {nMsg && <div className="promo-msg">{nMsg}</div>}
           </div>
         </section>
       )}

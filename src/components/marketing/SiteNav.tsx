@@ -13,7 +13,7 @@ export default function SiteNav({ user }: { user: SafeUser | null }) {
 
       <div className="nav-center">
         <Link href="/#funkcie">Funkcie</Link>
-        <Link href="/#ako">Ako to funguje</Link>
+        <Link href="/templates">Templaty</Link>
         <Link href="/plugin">Plugin 🎮</Link>
         <Link href="/#cennik">Ceny</Link>
         <Link href="/#faq">FAQ</Link>
