@@ -24,8 +24,8 @@ export const PLANS: Plan[] = [
     credits: `${FREE_CREDITS} kreditov na štart`,
     features: [
       "Vyskúšaj bez záväzkov",
-      "Prístup k lacnejším modelom",
-      "Kopírovanie kódu + zvýraznenie",
+      "Generovanie Roblox skriptov",
+      "Kopírovanie a sťahovanie kódu",
     ],
     cta: "Začať zadarmo",
   },
@@ -36,10 +36,10 @@ export const PLANS: Plan[] = [
     period: "/ mesiac",
     credits: "1 000 kreditov / mesiac",
     features: [
-      "Všetky modely vrátane Claude",
+      "Špičková AI kvalita",
+      "Priame kódovanie v Roblox Studio",
       "História konverzácií",
       "Prioritná rýchlosť",
-      "Ideálne pre jednu hru",
     ],
     highlight: true,
     cta: "Vybrať Hobby",

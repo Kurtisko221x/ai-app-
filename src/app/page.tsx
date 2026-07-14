@@ -25,14 +25,14 @@ const FEATURES = [
     text: "Žiadne odborné termíny netreba. Napíš „chcem dvere čo sa otvoria po dotyku“ a máš hotový kód.",
   },
   {
-    icon: "📋",
-    title: "Kód na jeden klik",
-    text: "Zvýraznená syntax a tlačidlo Kopírovať. Prilepíš do Studia a hra funguje.",
+    icon: "🎮",
+    title: "Kóduj priamo v Studiu",
+    text: "Nie si viazaný len na web. Cez náš plugin pošleš skript rovno do Roblox Studia — vloží sa sám na správne miesto.",
   },
   {
-    icon: "🎓",
-    title: "Učí ťa popri tom",
-    text: "Nielen kód — aj vysvetlenie ako funguje. Postupne sa staneš lepším tvorcom.",
+    icon: "⬇️",
+    title: "Kopíruj alebo stiahni",
+    text: "Zvýraznená syntax, tlačidlo Kopírovať aj Stiahnuť (.lua) do PC. Ako sa ti hodí.",
   },
   {
     icon: "🛡️",

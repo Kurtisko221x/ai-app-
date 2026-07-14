@@ -27,16 +27,27 @@
 }
 
 :root {
-  --bg: #0d1117;
-  --bg-elev: #161b22;
-  --bg-elev2: #1c2330;
-  --border: #2a3441;
-  --text: #e6edf3;
-  --text-dim: #8b98a5;
-  --accent: #00a2ff;
+  --bg: #080b11;
+  --bg-elev: #10151d;
+  --bg-elev2: #171d27;
+  --border: #232c39;
+  --border-soft: #1b222d;
+  --text: #eaf0f7;
+  --text-dim: #8b98a8;
+  --accent: #2f9bff;
   --accent-2: #e2231a; /* roblox red */
-  --user-bubble: #1f6feb;
-  --radius: 14px;
+  --accent-purple: #7c5cff;
+  --user-bubble: #2563eb;
+  --radius: 16px;
+
+  /* premium tokeny */
+  --grad-brand: linear-gradient(135deg, #2f9bff 0%, #7c5cff 100%);
+  --grad-brand-3: linear-gradient(120deg, #2f9bff, #7c5cff 55%, #e2231a);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-brd: rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 10px 40px rgba(47, 155, 255, 0.18);
 }
 
 * {
@@ -50,9 +61,15 @@ body {
 }
 
 body {
-  background: radial-gradient(1200px 800px at 80% -10%, #16233a 0%, var(--bg) 55%);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(47, 155, 255, 0.28);
 }
 
 /* ---------- Layout ---------- */
@@ -333,6 +350,10 @@ body {
   letter-spacing: 0.5px;
   color: var(--text-dim);
 }
+.code-actions {
+  display: flex;
+  gap: 6px;
+}
 .copy-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -341,6 +362,7 @@ body {
   padding: 3px 9px;
   font-size: 11px;
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .copy-btn:hover {
   color: var(--text);

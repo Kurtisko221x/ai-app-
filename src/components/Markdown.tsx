@@ -27,13 +27,37 @@ function CodeBlock({ className, children }: ComponentProps<"code">) {
     }
   }
 
+  function download() {
+    const isLua = /lua|luau/i.test(lang);
+    const ext = isLua ? "lua" : lang === "code" ? "txt" : lang;
+    const blob = new Blob([text.replace(/\n$/, "")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `xskinny-script.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="code-wrap">
       <div className="code-head">
         <span className="code-lang">{lang}</span>
-        <button className="copy-btn" onClick={copy} type="button">
-          {copied ? "✓ Skopírované" : "Kopírovať"}
-        </button>
+        <div className="code-actions">
+          <button
+            className="copy-btn"
+            onClick={download}
+            type="button"
+            title="Stiahnuť do PC"
+          >
+            ⬇ Stiahnuť
+          </button>
+          <button className="copy-btn" onClick={copy} type="button">
+            {copied ? "✓ Skopírované" : "Kopírovať"}
+          </button>
+        </div>
       </div>
       <pre>
         <code className={className}>{children}</code>

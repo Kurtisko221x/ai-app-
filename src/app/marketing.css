@@ -39,20 +39,25 @@
   width: 100%;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #00a2ff, #1f6feb);
+  background: var(--grad-brand);
   color: #fff;
-  box-shadow: 0 6px 20px rgba(0, 162, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(47, 155, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .btn-primary:hover {
-  box-shadow: 0 8px 26px rgba(0, 162, 255, 0.4);
+  filter: brightness(1.1) saturate(1.05);
+  box-shadow: 0 12px 34px rgba(47, 155, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 .btn-outline {
-  background: transparent;
-  border-color: var(--border);
+  background: var(--glass);
+  border-color: var(--glass-brd);
   color: var(--text);
+  backdrop-filter: blur(6px);
 }
 .btn-outline:hover {
   border-color: var(--accent);
+  background: rgba(47, 155, 255, 0.08);
 }
 .btn-ghost {
   background: transparent;
@@ -78,13 +83,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 26px;
-  max-width: 1180px;
-  margin: 0 auto;
-  width: 100%;
-  background: rgba(13, 17, 23, 0.75);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  max-width: 1120px;
+  margin: 14px auto 0;
+  width: calc(100% - 28px);
+  background: rgba(16, 21, 29, 0.6);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid var(--glass-brd);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .nav-brand {
   display: flex;
@@ -158,17 +165,28 @@
   margin-bottom: 18px;
 }
 .hero h1 {
-  font-size: 48px;
-  line-height: 1.08;
-  margin: 0 0 18px;
-  letter-spacing: -1px;
-  font-weight: 800;
+  font-size: 54px;
+  line-height: 1.05;
+  margin: 0 0 20px;
+  letter-spacing: -1.8px;
+  font-weight: 850;
 }
 .grad {
-  background: linear-gradient(120deg, #00a2ff, #7c4dff 60%, #e2231a);
+  background: linear-gradient(120deg, #2f9bff, #7c5cff 50%, #e2231a 100%);
+  background-size: 220% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: gradShift 8s ease infinite;
+}
+@keyframes gradShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 .hero-sub {
   font-size: 18px;
@@ -378,16 +396,23 @@ pre.lua code {
   margin: 0 auto 44px;
 }
 .eyebrow {
-  color: var(--accent);
+  display: inline-block;
+  color: #9dc9ff;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(47, 155, 255, 0.1);
+  border: 1px solid rgba(47, 155, 255, 0.22);
 }
 .section-head h2 {
-  font-size: 34px;
-  margin: 10px 0 12px;
-  letter-spacing: -0.5px;
+  font-size: 38px;
+  margin: 16px 0 12px;
+  letter-spacing: -1px;
+  font-weight: 800;
+  line-height: 1.1;
 }
 .section-head p {
   color: var(--text-dim);
@@ -438,23 +463,55 @@ pre.lua code {
   gap: 18px;
 }
 .feature-card {
-  background: var(--bg-elev);
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)) ,
+    var(--bg-elev);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 26px;
-  transition: border-color 0.15s, transform 0.15s;
+  border-radius: 18px;
+  padding: 28px 26px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s,
+    border-color 0.25s;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad-brand);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
 }
 .feature-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border-color: transparent;
+}
+.feature-card:hover::before {
+  opacity: 1;
 }
 .feature-icon {
-  font-size: 30px;
-  margin-bottom: 14px;
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  font-size: 26px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, rgba(47, 155, 255, 0.18), rgba(124, 92, 255, 0.18));
+  border: 1px solid var(--glass-brd);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .feature-card h3 {
   margin: 0 0 8px;
   font-size: 17px;
+  letter-spacing: -0.2px;
 }
 .feature-card p {
   color: var(--text-dim);
@@ -1007,12 +1064,25 @@ body::before {
   content: "";
   position: fixed;
   inset: -20%;
-  z-index: -1;
+  z-index: -2;
   background:
-    radial-gradient(600px 500px at 15% 10%, rgba(0, 162, 255, 0.14), transparent 60%),
-    radial-gradient(700px 600px at 85% 20%, rgba(124, 77, 255, 0.14), transparent 60%),
-    radial-gradient(600px 600px at 50% 100%, rgba(226, 35, 26, 0.08), transparent 60%);
-  animation: aurora 18s ease-in-out infinite alternate;
+    radial-gradient(680px 560px at 12% 4%, rgba(47, 155, 255, 0.18), transparent 60%),
+    radial-gradient(760px 640px at 88% 14%, rgba(124, 92, 255, 0.16), transparent 60%),
+    radial-gradient(620px 620px at 50% 108%, rgba(226, 35, 26, 0.07), transparent 60%);
+  animation: aurora 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+/* jemná mriežka pre "techy" premium feel */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(1200px 700px at 50% 0%, #000 0%, transparent 75%);
   pointer-events: none;
 }
 @keyframes aurora {
