@@ -1,5 +1,65 @@
 @import "tailwindcss";
 
+/* ---------- Premium efekty (kurzor glow + častice) ---------- */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(circle, rgba(47, 155, 255, 0.55), rgba(124, 92, 255, 0.25) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  transition: width 0.15s, height 0.15s, opacity 0.2s;
+  will-change: transform;
+}
+.cursor-glow.down {
+  width: 40px;
+  height: 40px;
+}
+.fx-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fx-particle {
+  position: absolute;
+  bottom: -40px;
+  color: rgba(120, 160, 255, 0.16);
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 700;
+  animation-name: floatUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  user-select: none;
+}
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-108vh) rotate(24deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-particle {
+    display: none;
+  }
+}
+
 /* Tlačidlo "Poslať do Studia" pod AI odpoveďou */
 .studio-actions {
   display: flex;

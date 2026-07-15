@@ -201,6 +201,18 @@ export default function Chat({
     loadChats();
   }
 
+  async function renameChat(id: string, current: string, e: MouseEvent) {
+    e.stopPropagation();
+    const title = window.prompt("Nový názov konverzácie:", current);
+    if (!title || !title.trim()) return;
+    await fetch(`/api/chats/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: title.trim() }),
+    });
+    loadChats();
+  }
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/");
@@ -278,14 +290,24 @@ export default function Chat({
               onClick={() => openChat(c.id)}
             >
               <span className="chat-item-title">💬 {c.title}</span>
-              <button
-                className="chat-del"
-                onClick={(e) => deleteChat(c.id, e)}
-                title="Zmazať"
-                type="button"
-              >
-                ✕
-              </button>
+              <span className="chat-actions">
+                <button
+                  className="chat-del"
+                  onClick={(e) => renameChat(c.id, c.title, e)}
+                  title="Premenovať"
+                  type="button"
+                >
+                  ✎
+                </button>
+                <button
+                  className="chat-del"
+                  onClick={(e) => deleteChat(c.id, e)}
+                  title="Zmazať"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </span>
             </div>
           ))}
         </div>

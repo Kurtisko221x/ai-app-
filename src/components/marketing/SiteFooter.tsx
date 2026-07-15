@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Avatar, BrandName } from "@/components/Brand";
+import { DISCORD_INVITE } from "@/lib/site";
+import { getDict } from "@/lib/i18n";
 
-export default function SiteFooter() {
+export default async function SiteFooter() {
+  const { t } = await getDict();
   return (
     <footer className="site-footer">
       <div className="footer-inner">
@@ -10,38 +13,37 @@ export default function SiteFooter() {
             <Avatar size={30} />
             <BrandName small /> <span className="scripter-tag">scripter</span>
           </div>
-          <p>
-            Tvoj AI parťák na tvorbu Roblox hier. Od nápadu ku kódu za sekundy.
-          </p>
+          <p>{t.footer.desc}</p>
           <p className="footer-owner">
-            Owner: <b>XSkinny</b> · beta verzia
+            Owner: <b>XSkinny</b> · beta
           </p>
         </div>
         <div className="footer-cols">
           <div>
-            <h4>Produkt</h4>
-            <Link href="/#funkcie">Funkcie</Link>
-            <Link href="/#ako">Ako to funguje</Link>
-            <Link href="/#cennik">Ceny</Link>
+            <h4>{t.footer.product}</h4>
+            <Link href="/#funkcie">{t.footer.l_features}</Link>
+            <Link href="/#ako">{t.footer.l_how}</Link>
+            <Link href="/#cennik">{t.footer.l_pricing}</Link>
           </div>
           <div>
-            <h4>Účet</h4>
-            <Link href="/signup">Registrácia</Link>
-            <Link href="/login">Prihlásenie</Link>
-            <Link href="/chat">Aplikácia</Link>
+            <h4>{t.footer.account}</h4>
+            <Link href="/signup">{t.footer.l_signup}</Link>
+            <Link href="/login">{t.footer.l_login}</Link>
+            <Link href="/chat">{t.footer.l_app}</Link>
           </div>
           <div>
-            <h4>Pomoc</h4>
-            <Link href="/#faq">FAQ</Link>
+            <h4>{t.footer.community}</h4>
+            <Link href="/#faq">{t.footer.l_faq}</Link>
+            <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
+              {t.footer.l_discord}
+            </a>
+            <Link href="/templates">{t.footer.l_templates}</Link>
           </div>
         </div>
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} XSkinny AI scripter</span>
-        <span className="footer-disclaimer">
-          Nie sme spojení so spoločnosťou Roblox Corporation. „Roblox" je ochranná
-          známka jej vlastníka.
-        </span>
+        <span className="footer-disclaimer">{t.footer.disclaimer}</span>
       </div>
     </footer>
   );

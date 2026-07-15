@@ -1,57 +1,58 @@
 import Link from "next/link";
-import { PLANS } from "@/lib/plans";
+import { getDict } from "@/lib/i18n";
 
-export default function Pricing({ loggedIn }: { loggedIn: boolean }) {
+export default async function Pricing({ loggedIn }: { loggedIn: boolean }) {
+  const { t } = await getDict();
+  const p = t.pricing;
   return (
     <section id="cennik" className="section">
       <div className="section-head">
-        <span className="eyebrow">Cenník</span>
-        <h2>Jednoduché ceny. Žiadne prekvapenia.</h2>
-        <p>
-          Začni zadarmo. Plať len keď to naozaj používaš — kredity míňaš len za
-          odpovede AI.
-        </p>
+        <span className="eyebrow">{p.eyebrow}</span>
+        <h2>{p.title}</h2>
+        <p>{p.sub}</p>
       </div>
 
       <div className="pricing-grid">
-        {PLANS.map((plan) => (
-          <div
-            key={plan.id}
-            className={`price-card ${plan.highlight ? "featured" : ""}`}
-          >
-            {plan.highlight && <div className="price-badge">Najobľúbenejší</div>}
-            <div className="price-name">{plan.name}</div>
-            <div className="price-amount">
-              <span className="price-value">{plan.price}</span>
-              <span className="price-period">{plan.period}</span>
+        {p.plans.map((plan) => {
+          const isFree = plan.price.replace(/[^0-9]/g, "") === "0";
+          return (
+            <div
+              key={plan.name}
+              className={`price-card ${plan.highlight ? "featured" : ""}`}
+            >
+              {plan.highlight && (
+                <div className="price-badge">{p.popular}</div>
+              )}
+              <div className="price-name">{plan.name}</div>
+              <div className="price-amount">
+                <span className="price-value">{plan.price}</span>
+                <span className="price-period">{plan.period}</span>
+              </div>
+              <div className="price-credits">{plan.credits}</div>
+              <ul className="price-features">
+                {plan.features.map((f) => (
+                  <li key={f}>
+                    <span className="check">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              {isFree ? (
+                <Link
+                  href={loggedIn ? "/chat" : "/signup"}
+                  className="btn btn-outline full"
+                >
+                  {plan.cta}
+                </Link>
+              ) : (
+                <span className="btn btn-primary full disabled" aria-disabled>
+                  {p.soon}
+                </span>
+              )}
             </div>
-            <div className="price-credits">{plan.credits}</div>
-            <ul className="price-features">
-              {plan.features.map((f) => (
-                <li key={f}>
-                  <span className="check">✓</span> {f}
-                </li>
-              ))}
-            </ul>
-            {plan.id === "free" ? (
-              <Link
-                href={loggedIn ? "/chat" : "/signup"}
-                className="btn btn-outline full"
-              >
-                {plan.cta}
-              </Link>
-            ) : (
-              <span className="btn btn-primary full disabled" aria-disabled>
-                Čoskoro 🔜
-              </span>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
-      <p className="pricing-note">
-        💳 Platby (Stripe) pripravujeme. Zatiaľ si vyskúšaj všetko zadarmo na
-        štartovacích kreditoch.
-      </p>
+      <p className="pricing-note">{p.note}</p>
     </section>
   );
 }

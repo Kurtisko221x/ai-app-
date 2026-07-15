@@ -29,6 +29,26 @@ export async function GET(
   return Response.json({ chat });
 }
 
+// Premenuje chat
+export async function PATCH(
+  req: NextRequest,
+  ctx: RouteContext<"/api/chats/[id]">
+) {
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "unauth" }, { status: 401 });
+  const { id } = await ctx.params;
+
+  const body = await req.json().catch(() => ({}));
+  const title = (body.title ?? "").toString().trim().slice(0, 80);
+  if (!title) return Response.json({ error: "empty" }, { status: 400 });
+
+  await prisma.chat.updateMany({
+    where: { id, userId: user.id },
+    data: { title },
+  });
+  return Response.json({ ok: true, title });
+}
+
 // Zmaže chat
 export async function DELETE(
   _req: NextRequest,
