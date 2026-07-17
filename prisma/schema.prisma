@@ -24,6 +24,8 @@ model User {
   apiKey       String?  @unique // kľúč pre Roblox Studio plugin
   discordId    String?  @unique // prepojený Discord účet (prihlásenie cez Discord)
   discordName  String? // Discord používateľské meno (na zobrazenie)
+  avatar       String? // profilová fotka (malý data URL, ~pár KB)
+  lastSeenAt   DateTime? // posledná aktivita (online users)
   createdAt    DateTime @default(now())
 
   chats          Chat[]

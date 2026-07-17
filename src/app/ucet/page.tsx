@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
 import AccountPanel from "@/components/AccountPanel";
 import PluginKeyPanel from "@/components/PluginKeyPanel";
+import AvatarUpload from "@/components/AvatarUpload";
 import { Avatar, BrandName } from "@/components/Brand";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +47,10 @@ export default async function AccountPage() {
         <div className="account-grid">
           <div className="account-card">
             <div className="account-label">Prihlásený ako</div>
+            <AvatarUpload
+              name={user.name || user.email.split("@")[0]}
+              avatar={user.avatar}
+            />
             <div className="account-value">{user.name || "—"}</div>
             <div className="account-email">{user.email}</div>
             {full?.robloxName && (

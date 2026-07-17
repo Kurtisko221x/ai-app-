@@ -68,6 +68,7 @@ export type SafeUser = {
   name: string | null;
   credits: number;
   role: string;
+  avatar: string | null;
 };
 
 // Zoznam admin emailov z .env.local (ADMIN_EMAILS=a@b.com,c@d.com)
@@ -88,7 +89,14 @@ export async function getCurrentUser(): Promise<SafeUser | null> {
   if (!userId) return null;
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, name: true, credits: true, role: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      credits: true,
+      role: true,
+      avatar: true,
+    },
   });
   if (!user) return null;
   // Bezpečnostná poistka: ak je email v ADMIN_EMAILS, ber ho vždy ako admina.

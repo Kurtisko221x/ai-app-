@@ -11,27 +11,103 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Markdown } from "./Markdown";
-import { Avatar, BrandName } from "./Brand";
+import { Avatar, AiAvatar, BrandName } from "./Brand";
+import UserAvatar from "./UserAvatar";
 
 type Message = { role: "user" | "assistant"; content: string };
 type ChatItem = { id: string; title: string; updatedAt: string };
+type OnlineUser = { id: string; name: string; avatar: string | null; me: boolean };
 
-const SUGGESTIONS = [
-  "Sprav mi skript na dvere ktoré sa otvoria po dotyku",
-  "Ako spravím leaderboard s bodmi (kills) pre hráčov?",
-  "Vytvor kill-brick ktorý zabije hráča pri dotyku",
-  "Sprav shop GUI kde si hráč kúpi meč za coiny",
-];
+// UI texty chatu (EN/SK)
+const CHAT_T = {
+  en: {
+    suggestions: [
+      "Make a door script that opens on touch",
+      "How do I make a kills leaderboard?",
+      "Create a kill-brick that kills the player on touch",
+      "Make a shop GUI where players buy a sword with coins",
+    ],
+    newChat: "✦ New chat",
+    history: "History",
+    online: "Online",
+    noChats: "No chats yet",
+    credits: "credits",
+    getMore: "+ Get more",
+    account: "Account",
+    admin: "🛠️ Admin",
+    logout: "↪ Log out",
+    welcomeTitle: (n: string) => `Hey ${n}! What are we scripting?`,
+    welcomeSub:
+      "Describe your game or script in plain words — I'll write the full Luau code and tell you where to put it in Roblox Studio.",
+    placeholder: "Describe what you want to script... (Enter = send)",
+    outOfCredits: "⚡ You're out of credits!",
+    getCredits: "Get credits",
+    sendToStudio: "📤 Send to Studio",
+    rename: "New conversation name:",
+    modalTitle: "⚡ I want free credits",
+    modalSub:
+      "Tell us why you want credits — the owner reviews it and grants them. (Tip: mention what you're building.)",
+    modalPlaceholder: "E.g.: I'm making an obby game and need help with checkpoint scripts...",
+    modalSend: "Send request",
+    modalSending: "Sending...",
+    modalSentTitle: "Request sent!",
+    modalSentSub: "The owner (XSkinny) will review your request and grant credits. 🙏",
+    modalOk: "Got it",
+    modalPromo: "Have a promo code? Redeem it on",
+    modalAccount: "your account",
+  },
+  sk: {
+    suggestions: [
+      "Sprav mi skript na dvere ktoré sa otvoria po dotyku",
+      "Ako spravím leaderboard s bodmi (kills) pre hráčov?",
+      "Vytvor kill-brick ktorý zabije hráča pri dotyku",
+      "Sprav shop GUI kde si hráč kúpi meč za coiny",
+    ],
+    newChat: "✦ Nový chat",
+    history: "História",
+    online: "Online",
+    noChats: "Zatiaľ žiadne chaty",
+    credits: "kreditov",
+    getMore: "+ Získať viac",
+    account: "Účet",
+    admin: "🛠️ Admin",
+    logout: "↪ Odhlásiť",
+    welcomeTitle: (n: string) => `Ahoj ${n}! Čo ideme skriptovať?`,
+    welcomeSub:
+      "Popíš svoju hru alebo skript vlastnými slovami — napíšem ti hotový Luau kód a poviem kam ho v Roblox Studio vložiť.",
+    placeholder: "Napíš čo chceš vyskriptovať... (Enter = odoslať)",
+    outOfCredits: "⚡ Došli ti kredity!",
+    getCredits: "Získať kredity",
+    sendToStudio: "📤 Poslať do Studia",
+    rename: "Nový názov konverzácie:",
+    modalTitle: "⚡ Chcem free kredity",
+    modalSub:
+      "Napíš prečo chceš kredity — owner to schváli a pridelí ti ich. (Tip: uveď na čom pracuješ.)",
+    modalPlaceholder: "Napr.: Robím obby hru a potrebujem pomoc so skriptami na checkpointy...",
+    modalSend: "Odoslať žiadosť",
+    modalSending: "Odosielam...",
+    modalSentTitle: "Žiadosť odoslaná!",
+    modalSentSub: "Owner (XSkinny) tvoju žiadosť skontroluje a pridelí kredity. 🙏",
+    modalOk: "Rozumiem",
+    modalPromo: "Máš promo kód? Zadaj ho na",
+    modalAccount: "svojom účte",
+  },
+};
 
 export default function Chat({
   userName,
   initialCredits,
   isAdmin,
+  userAvatar = null,
+  lang = "en",
 }: {
   userName: string;
   initialCredits: number;
   isAdmin: boolean;
+  userAvatar?: string | null;
+  lang?: "en" | "sk";
 }) {
+  const T = CHAT_T[lang];
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [chats, setChats] = useState<ChatItem[]>([]);
@@ -50,6 +126,8 @@ export default function Chat({
   const [reqState, setReqState] = useState<"idle" | "sending" | "sent">("idle");
   const [reqError, setReqError] = useState<string | null>(null);
 
+  const [online, setOnline] = useState<OnlineUser[]>([]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -66,6 +144,27 @@ export default function Chat({
   useEffect(() => {
     loadChats();
   }, [loadChats]);
+
+  // Prítomnosť: heartbeat + zoznam online používateľov (každú minútu)
+  useEffect(() => {
+    let stop = false;
+    async function tick() {
+      try {
+        await fetch("/api/presence", { method: "POST" });
+        const res = await fetch("/api/presence");
+        const data = await res.json();
+        if (!stop && Array.isArray(data.users)) setOnline(data.users);
+      } catch {
+        /* ignore */
+      }
+    }
+    tick();
+    const iv = setInterval(tick, 60_000);
+    return () => {
+      stop = true;
+      clearInterval(iv);
+    };
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -203,7 +302,7 @@ export default function Chat({
 
   async function renameChat(id: string, current: string, e: MouseEvent) {
     e.stopPropagation();
-    const title = window.prompt("Nový názov konverzácie:", current);
+    const title = window.prompt(T.rename, current);
     if (!title || !title.trim()) return;
     await fetch(`/api/chats/${id}`, {
       method: "PATCH",
@@ -275,13 +374,13 @@ export default function Chat({
         </Link>
 
         <button className="new-chat-btn" onClick={newChat} type="button">
-          ✦ Nový chat
+          {T.newChat}
         </button>
 
-        <div className="sb-section-title">História</div>
+        <div className="sb-section-title">{T.history}</div>
         <div className="chat-list">
           {chats.length === 0 && (
-            <div className="chat-empty">Zatiaľ žiadne chaty</div>
+            <div className="chat-empty">{T.noChats}</div>
           )}
           {chats.map((c) => (
             <div
@@ -312,6 +411,25 @@ export default function Chat({
           ))}
         </div>
 
+        {online.length > 0 && (
+          <>
+            <div className="sb-section-title">
+              <span className="online-dot" /> {T.online} ({online.length})
+            </div>
+            <div className="online-list">
+              {online.map((u) => (
+                <div key={u.id} className="online-item" title={u.name}>
+                  <UserAvatar name={u.name} avatar={u.avatar} size={22} />
+                  <span className="online-name">
+                    {u.name}
+                    {u.me ? " (ty)" : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
         <div className="sb-footer">
           <button
             className="credits-btn"
@@ -324,20 +442,23 @@ export default function Chat({
             type="button"
           >
             <span className={`credits-pill ${credits <= 5 ? "low" : ""}`}>
-              ⚡ {credits} kreditov
+              ⚡ {credits} {T.credits}
             </span>
-            <span className="get-more">+ Získať viac</span>
+            <span className="get-more">{T.getMore}</span>
           </button>
 
           <div className="sb-links">
-            <Link href="/ucet">👤 {userName}</Link>
+            <Link href="/ucet" className="sb-profile">
+              <UserAvatar name={userName} avatar={userAvatar} size={22} />{" "}
+              {userName}
+            </Link>
             {isAdmin && (
               <Link href="/admin" className="admin-link">
-                🛠️ Admin
+                {T.admin}
               </Link>
             )}
             <button onClick={logout} type="button">
-              ↪ Odhlásiť
+              {T.logout}
             </button>
           </div>
         </div>
@@ -370,14 +491,11 @@ export default function Chat({
         <div className="messages" ref={scrollRef}>
           {empty ? (
             <div className="welcome">
-              <Avatar size={64} />
-              <h1>Ahoj {userName}! Čo ideme skriptovať?</h1>
-              <p>
-                Popíš svoju hru alebo skript vlastnými slovami — napíšem ti hotový
-                Luau kód a poviem kam ho v Roblox Studio vložiť.
-              </p>
+              <AiAvatar size={72} />
+              <h1>{T.welcomeTitle(userName)}</h1>
+              <p>{T.welcomeSub}</p>
               <div className="suggestions">
-                {SUGGESTIONS.map((s) => (
+                {T.suggestions.map((s) => (
                   <button
                     key={s}
                     className="suggestion"
@@ -393,7 +511,11 @@ export default function Chat({
             messages.map((m, i) => (
               <div key={i} className={`msg ${m.role}`}>
                 <div className="avatar">
-                  {m.role === "user" ? "🧑" : <Avatar size={34} />}
+                  {m.role === "user" ? (
+                    <UserAvatar name={userName} avatar={userAvatar} size={34} />
+                  ) : (
+                    <AiAvatar size={34} />
+                  )}
                 </div>
                 <div className="bubble">
                   {m.role === "assistant" ? (
@@ -408,7 +530,7 @@ export default function Chat({
                                 onClick={() => sendToStudio(i, m.content)}
                                 type="button"
                               >
-                                📤 Poslať do Studia
+                                {T.sendToStudio}
                               </button>
                               {studioStatus[i] && (
                                 <span className="studio-status">
@@ -436,13 +558,13 @@ export default function Chat({
 
         {outOfCredits && (
           <div className="credits-banner">
-            <span>⚡ Došli ti kredity!</span>
+            <span>{T.outOfCredits}</span>
             <button
               className="credits-cta"
               onClick={() => setShowCreditModal(true)}
               type="button"
             >
-              Získať kredity
+              {T.getCredits}
             </button>
           </div>
         )}
@@ -458,7 +580,7 @@ export default function Chat({
                 send(input);
               }
             }}
-            placeholder="Napíš čo chceš vyskriptovať... (Enter = odoslať)"
+            placeholder={T.placeholder}
             rows={1}
             disabled={loading}
           />
@@ -488,30 +610,25 @@ export default function Chat({
             {reqState === "sent" ? (
               <div className="modal-success">
                 <div className="big-icon">✅</div>
-                <h2>Žiadosť odoslaná!</h2>
-                <p>
-                  Owner (XSkinny) tvoju žiadosť skontroluje a pridelí kredity. 🙏
-                </p>
+                <h2>{T.modalSentTitle}</h2>
+                <p>{T.modalSentSub}</p>
                 <button
                   className="btn btn-primary full"
                   onClick={() => setShowCreditModal(false)}
                   type="button"
                 >
-                  Rozumiem
+                  {T.modalOk}
                 </button>
               </div>
             ) : (
               <>
-                <h2>⚡ Chcem free kredity</h2>
-                <p className="modal-sub">
-                  Napíš prečo chceš kredity — owner to schváli a pridelí ti ich.
-                  (Tip: uveď na čom pracuješ.)
-                </p>
+                <h2>{T.modalTitle}</h2>
+                <p className="modal-sub">{T.modalSub}</p>
                 <textarea
                   className="modal-textarea"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="Napr.: Robím obby hru a potrebujem pomoc so skriptami na checkpointy..."
+                  placeholder={T.modalPlaceholder}
                   rows={4}
                 />
                 {reqError && <div className="auth-error">⚠️ {reqError}</div>}
@@ -521,11 +638,10 @@ export default function Chat({
                   disabled={reqState === "sending"}
                   type="button"
                 >
-                  {reqState === "sending" ? "Odosielam..." : "Odoslať žiadosť"}
+                  {reqState === "sending" ? T.modalSending : T.modalSend}
                 </button>
                 <p className="modal-note">
-                  Máš promo kód? Zadaj ho na stránke{" "}
-                  <Link href="/ucet">Môj účet</Link>.
+                  {T.modalPromo} <Link href="/ucet">{T.modalAccount}</Link>.
                 </p>
               </>
             )}
